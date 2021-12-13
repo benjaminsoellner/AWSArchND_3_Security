@@ -1,0 +1,47 @@
+# Identify tools that will allow you to do the following:
+
+## Scan infrastructure as code templates
+
+* Checkov (CloudFormation/Terraform)
+* TFLint (Terraform)
+* Terrafirma (Terraform)
+* Accurics (Kubernetes YAML, Terraform, OpenFaaS YAML und durch Dockerfile)
+* CloudSploit (CloudFormation)
+* Cfn-Lint (CloudFormation)
+* Cfstripper (CloudFormation)
+
+### Example vulnerability
+
+* overly permissive IAM rules or NSG policies
+* secrets stored in code (even linting before check-in)
+* public S3 buckets
+
+## Scan AMI’s or containers for OS vulnerabilities
+
+* Accurics (Kubernetes YAML, Terraform, OpenFaaS YAML und durch Dockerfile)
+* Clair (Docker Containers)
+* Anchore (Docker Containers)
+* Falco (Kubernetes)
+* Aqua Security (Docker Containers)
+* JFrog Xray (Docker Containers)
+
+### Example vulnerability
+
+* Uncover known vulnerabilities of specific versions of software libraries deployed and/or used within containers or OS images
+
+## Scan an AWS environment for cloud configuration vulnerabilities
+
+* CloudSploit
+* Prowler
+* Scout2
+* CloudSploit
+* Fugue
+* CloudCustodian
+* Palo Alto Prisma Cloud
+* Cloud Conformity
+
+### Example vulnerability
+
+similar anti-patterns to IaC scanners, e.g.
+* unencrypted storage
+* overly permissive policies or Network Security Groups

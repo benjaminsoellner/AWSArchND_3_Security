@@ -1,0 +1,7 @@
+#### Describe GuardDuty findings that were detected related to the brute force attack
+
+Research the AWS Guard Duty documentation page and explain how GuardDuty may have detected this attack - i.e. what was its source of information.
+
+#### According to the GuardDuty screenshot, GuardDuty stopped showing me any findings related to anything for this account. (I also tried running the DDoS attack for 1+ hour.)
+
+Normally, according to [the documentation](https://aws.amazon.com/de/premiumsupport/knowledge-center/identify-attacks-with-guardduty/), GuardDuty should monitor and detect suspicious behaviour in the AWS account due to the overly permissive security group allowing SSH on all ports.

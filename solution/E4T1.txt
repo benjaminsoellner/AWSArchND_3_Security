@@ -1,0 +1,8 @@
+#### Identify 2-3 changes that can be made to our environment to prevent an ssh brute force attack from the internet.
+
+* Network security groups should be configured to only allow SSH traffic from specific IP ranges (not overly permissive 0.0.0.0/0)
+* The SSH host should disable password authentication (and only allow login with SSH key)
+
+#### Neither instance should have had access to the secret recipes bucket, in the even that instance API credentials were compromised how could we have prevented access to sensitive data.
+
+The data could be encrypted with a custom encryption key on upload. The key could be stored in AWS Key Management for better handling and governance w.r.t. who has access to the key.

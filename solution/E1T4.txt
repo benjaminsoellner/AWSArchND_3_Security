@@ -1,0 +1,4 @@
+#### Based on the architecture diagram, and the steps you have taken so far to upload data and access the application web service, identify at least 2 obvious poor practices as it relates to security.  Include justification.
+
+* InstanceRole has unrestricted access on all S3 Actions ("Action: 's3:*'") for all S3 Resources ("Resources: '*'"). This means that a user impersonating this role would have full access to all S3 buckets in the AWS Account.
+* WebAppSG has all ingress rules accepting traffic from arbitrary endpoints (0.0.0.0/0). This means that any of the openly declared ports, e.g. 22 for SSH, are open for anyone on the internet and could be attacked with e.g. password guessing attempts or DoS attacks.

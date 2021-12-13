@@ -1,0 +1,17 @@
+#### What additional architectural change can be made to reduce the internet facing attack surface of the web application instance.
+
+S3 buckets could be hardened by only allowing access to them via VPC endpoints, therefore limiting the access to the data to EC2 instances deployed into the VPC only.
+
+Web server can be moved to a private subnet (only exposing the load balancer to the internet).
+
+#### Assuming the IAM permissions for the S3 bucket are still insecure, would creating VPC private endpoints for S3 prevent the unauthorized access to the secrets bucket.
+
+If the attacker manages to take over the web server or by e.g. using a vulnerability of the web application stack, they could still impersonate the overly permissive IAM role.
+
+#### Will applying default encryption setting to the s3 buckets encrypt the data that already exists?
+
+No, only data that is newly uploaded would be encrypted. In order to encrypt old data, it would need to be re-uploaded in an encrypted fashion using e.g. AWS Batch.
+
+#### What would happen if the original cloud formation templates are applied to this environment.
+
+The changes made manually would be re-set, e.g. the encryption set manually would be deactivated and the IAM role would be reset to its original overly permissive form.

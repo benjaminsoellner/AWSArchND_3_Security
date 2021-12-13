@@ -1,0 +1,69 @@
+#### Research and analyze which of the vulnerabilities appear to be related to the code that was deployed for the environment in this project. Bonus - provide recommendations on how to remediate the vulnerabilities.
+
+These violations may be related to the deployed CloudFormation template:
+
+* AWS Config:
+  * `securityhub-encrypted-volumes-68827a52`: checks whether EBS volumes attached to EC2 instances are encrypted
+    * **risk**: a malicious actor that would gain access to the AWS account or to the AWS infrastructure could read the unencrypted data stored on the EC2 instances, including e.g. traffic logs which could contain personalized data (like IP traffic streams)
+    * **remediation**: create attached EBS volumes in encrypted state
+  * `securityhub-elb-deletion-protection-enabled-6105c943`: checks whether an Elastic Load Balancer has deletion protection enabled
+    + **risk**: ELB deletion protection exists to prevent accidential deletes of Load Balancers
+    * **remediation**: create `c1-web-service-alb` with deletion protection
+* AWS Inspector:
+  * High: ports TCP/UDP 23 (Telnet), TCP/UDP 20/21 (FTP) are reachable from the internet
+    * **risk**: of DoS or bruteforce attacks when attempting to connect, esp. over SSH, via password into the instance, modifying the web application, abusing the compute power or impersonating the role of the instance in AWS
+    * **remediation**: restrict NSG to narrower IP range or block all traffic alltogether
+  * Medium: for the web service instance, many other ports are reachable from the internet (DHCP, WINS, MongoDB, Elasticsearch, PostgreSQL, SMB, Kerberos, NetBIOS, RPC, NFS, Syslog, LDAP, Oracle, RDP, Print Services, Global Catalog LDAP over TLS, LDAP over TLS, SQL Server, ...)
+    * **risk**: of DoS on these ports, some of which may be open due to the OS default configuration and some of which might pose additional vulnerabilities that allow the user to create a shell into the instance
+    * **remediation**: block all traffic with NSG
+  * Low: for the web service instance, port TCP 80 (HTTP) and port HTTPS (443) are reachable from the internet
+    * **risk**: while the server is a webserver (port 80), the web server instance itself shouldn't be called directly from the internet - but only via TLS (HTTPS) via the load balancer. Any web/app server, e.g. in this case Python's Flask, comes with its own attack surface and set of potential vulnerabilities, e.g. esp. to DoS, which can be easily shielded by a load balancer
+    * **remediation**: block HTTP/HTTPS traffic from any source but ELB
+* GuardDuty:
+  * Ensure no security groups allow ingress from 0.0.0.0/0 to port 22
+    * **risk/remediation**: as outlined previously, NSGs have to be hardened to prevent all traffic except ELB traffic
+    * **related**: Ensure no security groups allow ingress from 0.0.0.0/0 to port 3389
+    * **related**: Ensure the default security group of every VPC restricts all traffic
+  * Ensure VPC flow logging is enabled in all VPCs
+    * **risk**: VPC flow logging logs traffic patterns in VPCs so abnormal traffic can be spotted
+    * **remediation**: create the default VPC with flow logging enabled
+  * Avoid the use of the "root" account
+    * **risk**: the OS account "root" is an easy attack target, since it's well known
+    * **remediation**: use another administrative account or disable "root" (especially on SSH) when setting up the EC2 instance
+
+Those violations may not:
+
+* AWS Config:
+  * `securityhub-iam-policy-no-statements-with-full-access-62ad6186`: checks whether an IAM policy grants access on all actions of all services ('"Action": "Service:*"')
+  * `securityhub-iam-password-policy-ensure-expires-d04dbb12`: checks whether passwords in IAM should expire for this account
+  * `securityhub-iam-password-policy-number-check-8cb8ee4f`: checks whether password strings in IAM must contain a number
+  * `securityhub-iam-password-policy-symbol-check-485e611c`: checks whether password strings in IAM must contain a symbol
+  * `securityhub-iam-password-policy-uppercase-letter-check-5d6c5fe9`: checks whether password strings in IAM must contain an uppercase letter
+  * `securityhub-guardduty-enabled-centralized-58a4278d`: checks whether Amazon GuardDuty is configured
+  * `securityhub-iam-support-policy-in-use-8338cf1f`: checks whether the 'AWSSupportAccess' managed policy is attached to any IAM user, group or role
+  * `securityhub-iam-password-policy-prevent-reuse-check-4039da96`: checks whether IAM password reuse is prevented
+* GuardDuty:
+  * Ensure MFA is enabled for the "root" account
+  * Ensure CloudTrail is enabled in all regions
+  * Ensure IAM password policy requires at least one uppercase letter
+  * Ensure IAM password policy requires at least one lowercase letter
+  * Ensure IAM password policy requires at least one symbol
+  * Ensure IAM password policy requires at least one number
+  * Ensure IAM password policy requires minimum password length of 14 or greater
+  * Ensure IAM password policy prevents password reuse
+  * Ensure IAM password policy expires passwords within 90 days or less
+  * Ensure a support role has been created to manage incidents with AWS Support
+  * Ensure a log metric filter and alarm exist for unauthorized API calls
+  *	Ensure a log metric filter and alarm exist for security group changes
+  * Ensure a log metric filter and alarm exist for changes to Network Access Control Lists (NACL)
+  * Ensure a log metric filter and alarm exist for changes to network gateways
+  * Ensure a log metric filter and alarm exist for route table changes
+  * Ensure a log metric filter and alarm exist for VPC changes
+  * Ensure a log metric filter and alarm exist for Management Console sign-in without MFA
+  * Ensure a log metric filter and alarm exist for usage of "root" account
+  * Ensure a log metric filter and alarm exist for IAM policy changes
+  * Ensure a log metric filter and alarm exist for CloudTrail configuration changes
+  * Ensure a log metric filter and alarm exist for AWS Management Console authentication failures
+  * Ensure a log metric filter and alarm exist for disabling or scheduled deletion of customer created CMKs
+  * Ensure a log metric filter and alarm exist for S3 bucket policy changes
+  * Ensure a log metric filter and alarm exist for AWS Config configuration changes
